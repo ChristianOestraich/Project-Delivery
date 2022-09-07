@@ -37,6 +37,7 @@ public class JWTConfig extends WebSecurityConfigurerAdapter
     {
         http.csrf().disable().authorizeRequests()
                    .antMatchers( HttpMethod.POST, "/login" ).permitAll()
+                   .antMatchers("/swagger-ui/*", "/swagger-ui.html", "/webjars/**", "/v2/**", "/swagger-resources/**").permitAll()
                    .antMatchers( HttpMethod.POST, "/api/user/save" ).permitAll()
                    .anyRequest().authenticated()
                    .and()

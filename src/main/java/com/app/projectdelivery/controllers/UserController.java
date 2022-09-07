@@ -24,44 +24,49 @@ public class UserController
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping( "/listAll" )
-    public ResponseEntity<List<UserModel>> listAll()
+    @GetMapping("/listAll")
+    public List<UserModel> findAll()
     {
-        return ResponseEntity.ok( userRepository.findAll() );
+        return userRepository.findAll();
+    }
+
+    @GetMapping( "/{id}" )
+    public ResponseEntity<UserModel> findOne( @PathVariable long id )
+    {
+        return userRepository.findById( id )
+                             .map( ResponseEntity::ok )
+                             .orElseGet( () -> ResponseEntity.notFound().build() );
     }
 
     @PostMapping( "/save" )
     public ResponseEntity<UserModel> save( @RequestBody @Valid UserModel user )
     {
-        user.setPassword( passwordEncoder.encode( user.getPassword() ) );
-        return ResponseEntity.ok( userRepository.save( user ) );
+        return saveUser( user );
     }
 
-    @DeleteMapping( value = "/delete/{id}" )
-    public ResponseEntity<UserModel> deletePost( @PathVariable Integer userId )
+    @DeleteMapping( "/{id}" )
+    public ResponseEntity<?> remove( @PathVariable Long id )
     {
-        userRepository.delete( userRepository.findById( userId ).get() );
-
-        if ( userId != null )
-        {
-            return new ResponseEntity<>( HttpStatus.NOT_FOUND );
-        }
-
-        return new ResponseEntity<>( HttpStatus.OK );
-
+        return userRepository.findById( id )
+                             .map( userModel ->
+                             {
+                                 userRepository.deleteById( id );
+                                 return ResponseEntity.ok().build();
+                             } )
+                             .orElseGet( () -> ResponseEntity.notFound().build() );
     }
 
-    @PostMapping( "/edit/{id}" )
-    public ResponseEntity<UserModel> editPost( @PathVariable UserModel userId )
+    @PostMapping( "/edit" )
+    public ResponseEntity<UserModel> editPost( @RequestBody @Valid UserModel user )
     {
-        return null;
+        return saveUser( user );
     }
 
     @GetMapping( "/validatePassword" )
     public ResponseEntity<Boolean> validatePassword( @RequestParam String userName,
                                                      @RequestParam String password )
     {
-        Optional<UserModel> optUser = userRepository.findByUserName( userName );
+        Optional<UserModel> optUser = userRepository.findByUsername( userName );
         if ( optUser.toString().isEmpty() )
         {
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( false );
@@ -72,5 +77,11 @@ public class UserController
 
         HttpStatus status = ( valid ) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
         return ResponseEntity.status( status ).body( valid );
+    }
+
+    private ResponseEntity<UserModel> saveUser( UserModel user )
+    {
+        user.setPassword( passwordEncoder.encode( user.getPassword() ) );
+        return ResponseEntity.ok( userRepository.save( user ) );
     }
 }

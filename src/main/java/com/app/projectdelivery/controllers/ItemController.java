@@ -1,9 +1,7 @@
 package com.app.projectdelivery.controllers;
 
 import com.app.projectdelivery.model.ItemModel;
-import com.app.projectdelivery.model.UserModel;
 import com.app.projectdelivery.repository.ItemRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,28 +20,45 @@ public class ItemController
     }
 
     @GetMapping( "/listAll" )
-    public ResponseEntity<List<ItemModel>> listAll()
+    public List<ItemModel> findAll()
     {
-        return ResponseEntity.ok( itemRepository.findAll() );
+        return itemRepository.findAll();
+    }
+
+    @GetMapping( "/{id}" )
+    public ResponseEntity<ItemModel> findOne( @PathVariable long id )
+    {
+        return itemRepository.findById( id )
+                             .map( ResponseEntity::ok )
+                             .orElseGet( () -> ResponseEntity.notFound().build() );
     }
 
     @PostMapping( "/save" )
     public ResponseEntity<ItemModel> save( @RequestBody @Valid ItemModel item )
     {
-        return ResponseEntity.ok( itemRepository.save( item ) );
+        return saveItem( item );
     }
 
-    @DeleteMapping( value = "/delete/{id}" )
-    public ResponseEntity<UserModel> deletePost( @PathVariable Integer itemId )
+    @DeleteMapping( "/{id}" )
+    public ResponseEntity<?> remove( @PathVariable Long id )
     {
-        itemRepository.delete( itemRepository.findById( itemId ).get() );
+        return itemRepository.findById( id )
+                             .map( userModel ->
+                             {
+                                 itemRepository.deleteById( id );
+                                 return ResponseEntity.ok().build();
+                             } )
+                             .orElseGet( () -> ResponseEntity.notFound().build() );
+    }
 
-        if ( itemId != null )
-        {
-            return new ResponseEntity<>( HttpStatus.NOT_FOUND );
-        }
+    @PostMapping( "/edit" )
+    public ResponseEntity<ItemModel> editPost( @RequestBody @Valid ItemModel item )
+    {
+        return saveItem( item );
+    }
 
-        return new ResponseEntity<>( HttpStatus.OK );
-
+    private ResponseEntity<ItemModel> saveItem( ItemModel item )
+    {
+        return ResponseEntity.ok( itemRepository.save( item ) );
     }
 }

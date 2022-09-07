@@ -1,6 +1,7 @@
 package com.app.projectdelivery.model;
 
 import com.app.projectdelivery.jpa.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,7 +15,8 @@ public class UserModel extends BaseModel
     private String password;
     private String address;
 
-    @OneToMany( mappedBy = "users" )
+    @OneToMany( mappedBy = "userModel" )
+    @JsonIgnore
     private List<RequestModel> requestModals;
 
     public List<RequestModel> getRequestModals()

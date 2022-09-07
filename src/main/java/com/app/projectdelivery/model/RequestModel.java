@@ -1,6 +1,7 @@
 package com.app.projectdelivery.model;
 
 import com.app.projectdelivery.jpa.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,8 +17,10 @@ public class RequestModel extends BaseModel
     @JoinTable( name = "requests_items",
                 joinColumns = @JoinColumn( name = "request_id" ),
                 inverseJoinColumns = @JoinColumn( name = "item_id" ) )
+    @JsonIgnore
     private List<ItemModel> itemModals;
-    @OneToOne( mappedBy = "requests" )
+
+    @OneToOne( mappedBy = "requestModal" )
     private DeliveryModel deliveryModel;
 
     public DeliveryModel getDeliveryModel()

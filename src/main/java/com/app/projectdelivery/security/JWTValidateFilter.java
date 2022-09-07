@@ -19,7 +19,6 @@ public class JWTValidateFilter extends BasicAuthenticationFilter
     public static final String HEADER_ATTRIBUTE = "Authorization";
     public static final String PREFIX_ATTRIBUTE = "Bearer ";
 
-
     public JWTValidateFilter( AuthenticationManager authenticationManager )
     {
         super( authenticationManager );

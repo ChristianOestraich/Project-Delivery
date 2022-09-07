@@ -1,6 +1,7 @@
 package com.app.projectdelivery.model;
 
 import com.app.projectdelivery.jpa.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
